@@ -1,16 +1,27 @@
 var bcypher = require('blockcypher');
 var bitcoin = require("bitcoinjs-lib");
 var buffer  = require('buffer');
-var EC = require('elliptic');
 
+network = {
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'tb',
+    bip32: {
+      public: 0x043587cf,
+      private: 0x04358394
+    },
+    pubKeyHash: 0x6f,
+    scriptHash: 0xc4,
+    wif: 0xef
+};
 
-const key = bitcoin.ECPair.fromWIF('L1uyy5qTuGrVXrmrsvHWHgVzW9kKdrp27wBC7Vs6nZDTF2BRUVwy');
+const key = bitcoin.ECPair.fromWIF('cRqBQhx7ZLQZKrLohRukyTQZCgBqN187nn7VKHHC1cE4M95BqwAH', network);
 
 
 var source = {
-    private : "282942398d8acf0b8d3de383e351f9350f58c201232efb44b807ac5e030e1edd",
-    public  : "03b0df78845e71b28f988722dca4787d28fe6790f64614416c9183bd4f57e3c907",
-    address : "n23NcwTqygTdAhrrxip7sdwMpeKbNNF4ZA"
+    private : "7ecc4629e36353c756064c0c2d36597df6fc37dee4069ebd07aa845a8d08d075",
+    public  : "031b822b96c603dddd5ccf2655ac6bf04b7225dc3f02a15324063449a23510540c",
+    address : "mmSBomF54QBkuHEgNSvAnqh6GtgbDqCAaN",
+    wif: "cRqBQhx7ZLQZKrLohRukyTQZCgBqN187nn7VKHHC1cE4M95BqwAH"
 };
     
 //uses my blockcypher token.
@@ -43,24 +54,23 @@ function sign(err, data) {
         newtx = data;
         console.log(data);
         newtx.pubkeys     = [];
+        newtx.pubkeys.push(source.public);
         newtx.signatures  = data.tosign.map(function(tosign) {
-            newtx.pubkeys.push(source.public);
             var signature = key.sign(Buffer.from(tosign, "hex"));
-            return signature.toString("hex");
+            return signature.toDER().toString("hex");
         });
-        console.log(newtx);
         bcapi.sendTX(newtx, printResponse);
     }
 }
 //input address is randomly generated (and took some coins from a faucet).
 //output address is the faucet address.
 var newtx = {
-        "inputs": [{"addresses": ["n23NcwTqygTdAhrrxip7sdwMpeKbNNF4ZA"]}],
+        "inputs": [{"addresses": ["mmSBomF54QBkuHEgNSvAnqh6GtgbDqCAaN"]}],
         "outputs": [{"addresses": ["2NGZrVvZG92qGYqzTLjCAewvPZ7JE8S8VxE"], "value": 2500}]
 };
 
 
 
-bcapi.getAddrBal("n23NcwTqygTdAhrrxip7sdwMpeKbNNF4ZA", "", printResponse);
+bcapi.getAddrBal("mmSBomF54QBkuHEgNSvAnqh6GtgbDqCAaN", "", printResponse);
 
 bcapi.newTX(newtx, sign);
