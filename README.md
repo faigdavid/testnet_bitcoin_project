@@ -11,6 +11,7 @@ Makes a transaction from my testnet address to the faucet I got the coins from.
 * Can also generate a random testnet address.
 * Mainly used for testing.  
 ## How To:  
-Open CMD (windows) or terminal (linux) to testnet_bitcoin_project folder.
-Enter this command:  `Node blockcypher_project.js`  
+To run blockcypher_project.js, you need to use Nodejs.
+Open CMD (windows) or terminal (linux) to testnet_bitcoin_project folder, then enter:  
+```Node blockcypher_project.js```  
 To use balance.html, just open it.
