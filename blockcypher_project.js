@@ -29,48 +29,66 @@ var bcapi = new bcypher('btc','test3','bb4667547770483bb1efb2c1ac357b48');
 
 var newtx = null;
 
+//For printing JSON objects.
 function printResponse(err, data) {
   if (err !== null) {
     console.log(err);
   } else {
-    console.log(data);
+    var keys = Object.keys(data);
+    for (var i=0; i<keys.length; i++) {
+        console.log(keys[i] + ": " +  data[keys[i]]);
+    }
   }
 }
 
-
-function printResponse(err, data) {
-  if (err !== null) {
-    console.log(err);
-  } else {
-    console.log(data);
-  }
-}
-
+//Signs a the transaction.
 function sign(err, data) {
     if (err !== null) {
         console.log(err);
     } else {
+        var tx = data;
+        console.log("Recieved: " + data.tx.received);
+        console.log("Transaction recieved, signing...");
         
-        newtx = data;
-        console.log(data);
-        newtx.pubkeys     = [];
-        newtx.pubkeys.push(source.public);
-        newtx.signatures  = data.tosign.map(function(tosign) {
+        
+        tx.pubkeys     = [];
+        tx.signatures  = data.tosign.map(function(tosign) {
+            tx.pubkeys.push(source.public);
             var signature = key.sign(Buffer.from(tosign, "hex"));
-            return signature.toDER().toString("hex");
+            return signature.toString("hex");
         });
-        bcapi.sendTX(newtx, printResponse);
+        
+        //Attempt to send the signed transaction.
+        console.log("\nSending signed transaction...");
+        bcapi.sendTX(tx, function(err, data){
+              if (err !== null) {
+                console.log(err);
+              } else {
+                console.log("Recieved: " + data.tx.received);
+                console.log("\nTransaction Success.");
+              }
+            
+        });
     }
 }
+
 //input address is randomly generated (and took some coins from a faucet).
 //output address is the faucet address.
+//value is the amount to send.
 var newtx = {
         "inputs": [{"addresses": ["mmSBomF54QBkuHEgNSvAnqh6GtgbDqCAaN"]}],
         "outputs": [{"addresses": ["2NGZrVvZG92qGYqzTLjCAewvPZ7JE8S8VxE"], "value": 2500}]
 };
 
+console.log("\nGetting balance from my testnet address:");
+//Get balance of my bitcoin address.
+bcapi.getAddrBal("mmSBomF54QBkuHEgNSvAnqh6GtgbDqCAaN", "", 
+function(err, data){
+    //use callback so things happen in order.
+    printResponse(err, data);
+    
+    console.log("\nStarting new transaction...");
+    //Make a new transfer, pass to sign.
+    bcapi.newTX(newtx, sign);
+});
 
-
-bcapi.getAddrBal("mmSBomF54QBkuHEgNSvAnqh6GtgbDqCAaN", "", printResponse);
-
-bcapi.newTX(newtx, sign);
