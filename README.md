@@ -1,4 +1,4 @@
-## Project for job application.
+## Performs simple bitcoin transfers.
 ## Node_Modules:<br/>
 The following commands install every module in this folder.  
 * npm install blockcypher
