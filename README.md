@@ -1,5 +1,3 @@
-## Very simple script to perform bitcoin transfers.
-* Uses blockcyper api.
 ## Node_Modules:<br/>
 The following commands install every module in this folder.  
 * npm install blockcypher
